@@ -152,7 +152,9 @@ def head(p, title, desc, canon, og_img, og_type='website', ld=(), extra=''):
 
 # --------------------------------------------------------- header / footer
 def header(p, interna=True):
-    home = p + 'index.html' if p else '/'
+    # sempre relativo: '/' quebraria em file:// e no GitHub Pages de
+    # projeto, onde o site nao mora na raiz do dominio.
+    home = p + 'index.html'
     return f'''
 <a class="skip-link" href="#main">Pular para o conteúdo</a>
 
