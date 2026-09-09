@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /_arquivo/
+Disallow: /guide_hauzestern/
+Disallow: /tools/
+Disallow: /.cache-fundos/
+Disallow: /representantes.csv
+
+Sitemap: https://www.hauzestern.com/sitemap.xml
