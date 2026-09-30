@@ -25,7 +25,7 @@ TEL_TXT = '(51) 3564-8300'
 # Google Analytics 4: ID de medicao da propriedade (G-...). Nao e segredo, vai
 # no HTML de todo site com GA. Vazio = paginas sem tag. A mesma propriedade
 # mede a homologacao (github.io) e o dominio oficial.
-GA_ID = ''
+GA_ID = 'G-SZB5T79R9D'
 
 IG = 'https://www.instagram.com/hauzestern/'
 IG_SVG = ('<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">'

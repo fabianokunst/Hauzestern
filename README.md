@@ -562,9 +562,10 @@ Além das divergências listadas na auditoria:
   inventa o 9. Corrigir na planilha.
 - **Catálogo em PDF para download**: definir se o `Hauzestern_Catalogo_2026_WEB.pdf`
   vai ficar público e onde.
-- **Analytics**: a tag está pronta mas desligada até chegar o ID `G-…` da
-  propriedade (`GA_ID` em `tools/build_pages.py`). Antes do domínio oficial:
-  banner de cookies e política de privacidade. Ver [Analytics](#analytics-ga4).
+- **Analytics**: medindo desde 2026-09-30 (`G-SZB5T79R9D`, conta de outra
+  equipe). Falta a equipe do GA cadastrar as dimensões `resultados` e `achou`.
+  Antes do domínio oficial: banner de cookies e política de privacidade. Ver
+  [Analytics](#analytics-ga4).
 - `assets/logo-hauzestern*.png` e `logo-marca.png` são os logos antigos, extraídos
   do site anterior. Ficaram na pasta mas não são mais usados.
 - `_harness.html` na raiz é arquivo temporário de ferramenta — pode apagar.
