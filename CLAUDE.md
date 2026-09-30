@@ -3,41 +3,39 @@
 Site estático da Hauzestern (colchões da Herval), gerado por scripts Python em
 `tools/`. Estrutura, dados, decisões com a marca e pendências: `README.md`.
 
-## Publicação automática — sempre, sem pedir
+## Publicação automática no GitHub (homologação)
 
 O repositório <https://github.com/fabianokunst/Hauzestern> é **público** e o
 GitHub Pages publica o site direto dele em <https://fabianokunst.github.io/Hauzestern/>.
-O Fabiano quer que toda alteração vá para lá **automaticamente**: ele não vai
-pedir, e não é para perguntar. A autorização é permanente.
+Não é o site oficial: é o ambiente de **homologação** do Fabiano. A fonte da
+verdade é esta pasta; o GitHub só espelha o que está aqui.
 
-Ao terminar **qualquer** tarefa que altere arquivos do projeto (páginas, `css/`,
-`js/`, `assets/`, `tools/`, `README.md`, este arquivo):
+O Fabiano quer que toda alteração vá para lá **automaticamente**, inclusive
+trabalho pela metade. Isso já acontece sozinho: um hook `Stop` em
+`.claude/settings.json` roda `python tools/publicar.py --auto` ao fim de cada
+resposta do Claude e envia tudo o que mudou na pasta (em silêncio quando nada
+mudou; com uma linha "GitHub: ..." na conversa quando envia ou falha). Não
+pergunte antes de publicar — a autorização é permanente.
 
-1. Se mexeu em fontes (`tools/*.py` ou na planilha de representantes), regenere
-   com `python tools/build_all.py` — com o cuidado de "Sessões em paralelo".
-2. Veja o que vai subir: `python tools/publicar.py --dry-run`.
-3. Publique:
+Para um commit com mensagem descritiva em vez da automática, publique você
+mesmo antes de terminar:
 
-   ```
-   python tools/publicar.py "<o que mudou, em português>" --coautor "<sua linha de atribuição>"
-   ```
+```
+python tools/publicar.py "<o que mudou, em português>" --coautor "<sua linha de atribuição>"
+```
 
-   `--coautor` recebe o texto do `Co-Authored-By` que você usa em commits
-   (ex.: `"Claude Opus 5.5 <noreply@anthropic.com>"`).
-4. Termine a resposta dizendo que publicou (hash do commit) ou por que não.
+(`--coautor` recebe o texto do `Co-Authored-By` que você usa em commits, ex.:
+`"Claude Opus 5.5 <noreply@anthropic.com>"`; `--dry-run` só lista o que iria.)
 
-Publique só com a tarefa **completa e conferida**, nunca no meio dela nem antes
-de fazer uma pergunta ao Fabiano: o que é enviado vai ao ar na hora. Tarefa que
-só lê, tira dúvida ou gera arquivo fora do site (scratchpad) não publica nada.
+Se aparecer "GitHub: NÃO PUBLICADO — ..." (ou `NÃO PUBLICADO:` no modo manual):
 
-Se o `publicar.py` parar (`NÃO PUBLICADO: ...`):
-
-- **check.py acusou problema** → corrija o link, a imagem ou o índice da busca e rode de novo.
 - **arquivo interno no repositório** → nunca force; descubra por que entrou e tire.
-- **login** → o envio abre uma janela do GitHub; avise o Fabiano para entrar com
-  a conta `fabianokunst` e rode de novo (o commit local fica guardado).
+- **login** → o GitHub pede entrar com a conta `fabianokunst`; avise o Fabiano
+  (o commit local fica guardado e vai no próximo envio).
 - **conflito** → alguém subiu arquivos pelo site do GitHub; traga com
   `git pull --rebase`, resolva e publique.
+- **check.py acusou problema** → no modo automático o envio sai assim mesmo
+  (é homologação), só com o aviso; corrija quando for o caso.
 
 Nunca `git push --force`, `git reset --hard` nem reescrever o histórico sem o
 Fabiano pedir.
@@ -65,10 +63,8 @@ no disco no meio do trabalho.
 - Releia o trecho de arquivo compartilhado (`dados.py`, `build_pages.py`,
   `style.css`, `README.md`, `build_all.py`) antes de editar; use edição pontual,
   nunca reescreva o arquivo inteiro. CSS novo em bloco próprio no fim do `style.css`.
-- O `publicar.py` envia **tudo** o que mudou na pasta, inclusive o trabalho de
-  outra conversa. Se o `--dry-run` mostrar algo que não é seu e parece pela
-  metade (ex.: `tools/dados.py` mudou e as páginas não), publique só os seus
-  arquivos com `--so <caminhos>`.
+- O envio automático manda **tudo** o que mudou na pasta, inclusive o trabalho
+  de outra conversa em andamento — combinado com o Fabiano, é homologação.
 
 ## Regras do conteúdo
 
