@@ -48,12 +48,14 @@ def paras(lista, indent='      '):
 
 
 # ------------------------------------------------------------------ carrossel
-# Ordem pedida: 1 fundo branco, 2 ambientada, 3 fundo cinza.
-# A ambientada so entra onde a marca tem foto de ambiente (Wohl e Hemmen).
+# Ordem pedida: 1 fundo branco, 2 ambientada, 3 fundo cinza, 4 detalhe.
+# A ambientada so entra onde a marca tem foto de ambiente (Wohl e Hemmen); o
+# detalhe, onde a marca mandou close do acabamento (Krefel).
 VARIANTES_ORDEM = [
     ('branco', 'sobre fundo branco'),
     ('ambiente', 'em ambiente'),
     ('cinza', 'sobre fundo cinza'),
+    ('detalhe', 'em detalhe do tampo e da lateral'),
 ]
 
 
@@ -191,6 +193,15 @@ def header(p, interna=True):
       </a>
     </nav>
 
+    <!-- busca de produtos: o painel e o índice são do js/busca.js -->
+    <button class="busca-btn" type="button" data-busca-abrir aria-haspopup="dialog"
+            aria-expanded="false" aria-label="Buscar produtos" aria-keyshortcuts="/ Control+K"
+            title="Buscar produtos">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="10.5" cy="10.5"
+        r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m15.2 15.2 5.3 5.3"
+        fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+
     <button class="burger" id="burger" aria-expanded="false" aria-controls="nav" aria-label="Abrir menu">
       <span></span><span></span><span></span>
     </button>
@@ -244,6 +255,7 @@ def footer(p):
 </footer>
 
 <script src="{p}js/main.js" defer></script>
+<script src="{p}js/busca.js" defer></script>
 </body>
 </html>
 '''
@@ -365,7 +377,7 @@ def pdp_colchao(m, todos):
     if m.get('molejo'):
         molejos.append(('Molas ensacadas', m['molejo']))
     if m.get('molejo2'):
-        molejos.append(('Molas MaxSpring', m['molejo2']))
+        molejos.append((m.get('molejo2_titulo', 'Molas MaxSpring'), m['molejo2']))
     molejo_html = ''
     if molejos:
         cards = '\n      '.join(
@@ -527,7 +539,7 @@ def pdp_colchao(m, todos):
   <div class="wrap">
     <header class="section-head">
       <div>
-        <p class="eyebrow light reveal">Ícones do catálogo</p>
+        <p class="eyebrow light reveal">Ícones {'da ficha técnica' if m.get('icones_da_ficha') else 'do catálogo'}</p>
         <h2 id="tec-title" class="display reveal">Tecnologias no {nome}</h2>
       </div>
       <p class="section-note reveal">As tecnologias que a marca lista para este modelo.</p>
@@ -635,7 +647,8 @@ def pdp_base(b, todas):
             {'@type': 'PropertyValue', 'name': 'Altura dos pés', 'value': b['pes']},
             {'@type': 'PropertyValue', 'name': 'Pés', 'value': b['material']},
             {'@type': 'PropertyValue', 'name': 'Forro', 'value': 'TNT'},
-        ],
+        ] + ([{'@type': 'PropertyValue', 'name': 'Suporte (box rígido)',
+               'value': b['suporte']}] if b.get('suporte') else []),
     }, {
         '@context': 'https://schema.org', '@type': 'BreadcrumbList',
         'itemListElement': [
@@ -656,7 +669,7 @@ def pdp_base(b, todas):
 
     poetica = f'<p class="lede">{b["poetica"]}</p>' if b['poetica'] else ''
 
-    # o texto de ficha técnica existe só para C1705, C1706, C1707/Favo e Root
+    # o texto de ficha técnica existe para todas menos a C1674
     if b['ficha']:
         sobre = f'''
     <div class="prose reveal">
@@ -683,6 +696,8 @@ def pdp_base(b, todas):
 
     conflito = (f'<p class="nota reveal">{b["nota_conflito"]}</p>'
                 if b.get('nota_conflito') else '')
+    suporte = (f'\n          <li><strong>Suporte</strong><span>Box rígido, '
+               f'{b["suporte"]}</span></li>' if b.get('suporte') else '')
 
     outras = '\n      '.join(
         f'<a class="card reveal" href="{o["slug"]}.html">'
@@ -723,7 +738,7 @@ def pdp_base(b, todas):
           <li><strong>Altura do box</strong><span>{b['box']}</span></li>
           <li><strong>Altura dos pés</strong><span>{b['pes']}</span></li>
           <li><strong>Pés</strong><span>{b['material'].replace('Pés de ', '').capitalize()}</span></li>
-          <li><strong>Estrutura</strong><span>Eucalipto · forro de TNT</span></li>
+          <li><strong>Estrutura</strong><span>Eucalipto · forro de TNT</span></li>{suporte}
         </ul>
         {conflito}
         <div class="pdp-cta">

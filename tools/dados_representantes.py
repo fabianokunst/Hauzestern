@@ -64,6 +64,14 @@ CORRECOES = [
     ('TRIANGULO MINEIRO', 'TRIÂNGULO MINEIRO'),
 ]
 
+# Nomes de pessoa que a planilha grafa errado, com a grafia confirmada pelo
+# Fabiano. So entra aqui o que ele confirmou: o resto fica como na planilha.
+# Fica no gerador, e nao no CSV, para sobreviver a proxima importacao.
+NOMES_CORRIGIDOS = {
+    'TIAGO SPHOR': 'TIAGO SPOHR',       # e-mail tiago.spohr@ (2026-09-28)
+    'TIAGO SPORH': 'TIAGO SPOHR',
+}
+
 
 def corrigir(txt):
     bruto = (txt or '').replace('Í', 'I').replace('Ó', 'O').replace('Ã', 'A')
@@ -183,7 +191,8 @@ def contato(celula, papel):
                 f['rotulo'] = rotulo
             fones += fs
         else:
-            nomes.append(titulo(linha))
+            chave = re.sub(r'\s+', ' ', linha).upper()
+            nomes.append(titulo(NOMES_CORRIGIDOS.get(chave, linha)))
     # "COMERCIAL" / "ASSISTENCIA" na primeira linha e o setor, nao uma pessoa
     setor = None
     if len(nomes) > 1 and ' ' not in nomes[0]:

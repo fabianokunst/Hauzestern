@@ -17,9 +17,16 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.stdout.reconfigure(encoding='utf-8')
 
 import dados
-from build_pages import head, header, footer, write, SITE, IG, esc, TEL_HREF, TEL_TXT
+from build_pages import head, header, footer, write, SITE, IG, esc, paras, TEL_HREF, TEL_TXT
 
 P = ''
+
+# Bloco "Lançamento" da home: o modelo mais recente. Texto e selo saem de
+# dados.py (poetica + tecnica, verbatim da marca); so a descricao da foto e daqui.
+# Era o Wohl ate a chegada do Krefel (09/2026).
+LANCAMENTO = 'krefel'
+LANCAMENTO_ALT = ('Colchão Hauzestern Krefel, de lateral xadrez, sobre base box '
+                  'azul-marinho com pés de madeira')
 
 # os tres icones da faixa amarela — redesenhados a partir do site atual
 ICO = {
@@ -61,6 +68,12 @@ TECNOLOGIAS = [
   'do peso durante o uso. As áreas de maior impacto recebem uma camada de molas mais '
   'firmes, já as áreas de menor impacto recebem molas com arame de diâmetro menor.',
   ('Trizone',)),
+ ('Micro molas ensacadas',
+  'Camada de 400 molas p/m² de fio de aço especial ATC de 1,30 mm, posicionada acima do '
+  'sistema de molejo principal do colchão. Por serem menores e ensacadas '
+  'individualmente, as micro molas distribuem o peso de forma correta, reduzem os '
+  'pontos de pressão e respondem de maneira independente aos movimentos.',
+  ('Micro Molas',)),
  ('Sistema Thermo Flow',
   'Camada projetada com uma série de canais que facilitam a passagem do ar, em um '
   'colchão de aquecimento a ar multifuncional com acionamento por controle remoto. '
@@ -80,6 +93,11 @@ TECNOLOGIAS = [
   'Uma espuma especial, desenvolvida com células mais abertas, resultando em uma maior '
   'ventilação e aeração ao produto e gerando uma sensação de maior frescor.',
   ('Freshcool',)),
+ ('CloudCore™ Comfort System',
+  'Espuma de alta resiliência que combina maciez, adaptação e suporte inteligente. '
+  'Adapta-se ao corpo, aliviando pontos de pressão e proporcionando uma sensação '
+  'acolhedora, semelhante à leveza de uma nuvem.',
+  ('CloudCORE',)),
  ('Espuma viscoelástica',
   'Tem por característica principal sua maciez e viscosidade, permitindo a espuma se '
   'moldar ao corpo, garantindo um sono mais tranquilo e reparador.',
@@ -93,11 +111,13 @@ TECNOLOGIAS = [
   'complementada pela resiliência da espuma HR, que possui maior capacidade de retorno, '
   'proporcionando aporte entre o molejo e as camadas superiores.',
   ('Premium Foam', 'PremiumFoam')),
+ # so 'Flexxi': o texto e da manta de 8 cm em copos do Frost. O Krefel tambem
+ # tem latex natural, mas em camada de 2 cm — nao e o que este card descreve.
  ('Látex natural e Flexxi Cup',
   'A manta de látex de 8 cm em formato de copos garante um conforto individualizado, '
   'acomodando naturalmente o corpo. Essa camada gera um efeito de duplo molejo, '
   'aumentando ainda mais a sensação de relaxamento.',
-  ('Látex', 'Flexxi')),
+  ('Flexxi',)),
  ('Tecido Pure Silk',
   'Malha com alto percentual de viscose e seda. A viscose é caracterizada pelas '
   'propriedades termorreguladoras que auxiliam no conforto durante o sono. O toque macio '
@@ -133,9 +153,10 @@ def cards_colchoes(cs):
 
 def build():
     title = 'Hauzestern Colchões | Colchões premium com herança alemã — Grupo Herval'
-    desc = ('Hauzestern é a marca de colchões premium do Grupo Herval. 14 colchões em três '
-            'coleções, 6 bases e 5 travesseiros — com molas ensacadas, duplo molejo e '
-            'espumas técnicas.')
+    desc = (f'Hauzestern é a marca de colchões premium do Grupo Herval. '
+            f'{len(dados.COLCHOES)} colchões em três coleções, {len(dados.BASES)} bases e '
+            f'{len(dados.TRAVESSEIROS)} travesseiros — com molas ensacadas, duplo molejo e '
+            f'espumas técnicas.')
     canon = SITE + '/'
 
     ld = [{
@@ -223,12 +244,13 @@ def build():
             onde = (f'<p class="tech-onde">Em {len(modelos)} {plural}: '
                     f'{", ".join(modelos)}</p>')
         elif modelos:
-            onde = '<p class="tech-onde">Em todos os 14 colchões</p>'
+            onde = f'<p class="tech-onde">Em todos os {len(dados.COLCHOES)} colchões</p>'
         tec.append(f'<article class="tech-card reveal"><span class="num">{i:02d}</span>'
                    f'<h3>{n}</h3><p>{d}</p>{onde}</article>')
     tec = '\n        '.join(tec)
 
     g = dados.GARANTIA
+    lanc = next(m for m in dados.COLCHOES if m['slug'] == LANCAMENTO)
 
     return head(P, title, desc, canon, 'assets/produtos/wohl-cinza.jpg', 'website', ld) + f'''
 <body>
@@ -316,20 +338,16 @@ def build():
 <section class="section launch" aria-labelledby="launch-title">
   <div class="wrap launch-grid">
     <figure class="launch-media reveal">
-      <img src="assets/produtos/wohl-cinza.jpg" alt="Colchão Hauzestern Wohl sobre base box escura"
+      <img src="assets/produtos/{lanc['slug']}-cinza.jpg" alt="{esc(LANCAMENTO_ALT)}"
            width="1400" height="1050" loading="lazy">
     </figure>
     <div class="launch-text reveal">
-      <span class="badge">Novo em 2026</span>
-      <h2 id="launch-title" class="display">Wohl</h2>
-      <p class="sub left">Coleção Propósitos · 38 cm</p>
-      <p>Wohl apresenta mais uma inovação para a linha Propósitos. Além de contar com
-        molas ensacadas e espumas de alta qualidade, o novo modelo traz a exclusiva camada
-        <strong>Thermo Flow</strong>, que proporciona um aconchego excepcional e uma
-        temperatura ideal, adaptando-se perfeitamente às necessidades de cada usuário.</p>
-      <p>É um colchão de aquecimento a ar multifuncional: três modos de funcionamento,
-        temperatura ajustável de 20 a 37 °C e acionamento por controle remoto.</p>
-      <a class="link-arrow" href="colchoes/wohl.html">Conhecer o Wohl <span aria-hidden="true">&rarr;</span></a>
+      <span class="badge">{lanc['destaque']}</span>
+      <h2 id="launch-title" class="display">{lanc['nome']}</h2>
+      <p class="sub left">Coleção {dados.COLECOES[lanc['colecao']]['nome']} · {lanc['altura']} cm</p>
+      <p>{lanc['poetica']}</p>
+      {paras(lanc['tecnica'])}
+      <a class="link-arrow" href="colchoes/{lanc['slug']}.html">Conhecer o {lanc['nome']} <span aria-hidden="true">&rarr;</span></a>
     </div>
   </div>
 </section>
@@ -354,15 +372,22 @@ def build():
 <!-- ============================= COLCHÕES ============================= -->
 <section class="section products" id="colchoes" aria-labelledby="products-title">
   <div class="wrap">
-    <header class="section-head">
+    <header class="section-head stack">
       <div>
         <p class="eyebrow reveal">Catálogo</p>
-        <h2 id="products-title" class="display reveal">Três coleções, 14 colchões</h2>
+        <h2 id="products-title" class="display reveal">Três coleções, diferentes formas de viver o conforto</h2>
       </div>
-      <p class="section-note reveal">Todas as coleções contam com produtos com Molas
-        Ensacadas, Molas MaxSpring e Duplo Molejo — de forma que o lojista possa adquirir
-        qualquer linha e ainda assim ter produtos variados, que atendam a todos os tipos
-        de clientes.</p>
+      <div class="section-note reveal">
+        <p>Na Hauzestern, cada colchão nasce da combinação entre design, tecnologia e
+          conforto, traduzindo uma inspiração alemã em experiências de descanso pensadas
+          para diferentes estilos e necessidades.</p>
+        <p>Nossas coleções apresentam propostas distintas, com materiais, tecnologias e
+          sensações cuidadosamente selecionados para proporcionar uma experiência de
+          conforto única. Do toque dos tecidos à composição interna de cada produto, cada
+          detalhe é pensado para transformar o momento de descanso.</p>
+        <p>Descubra as coleções Hauzestern e encontre o colchão que traduz a sua forma de
+          descansar.</p>
+      </div>
     </header>
     {colecoes_html}
   </div>

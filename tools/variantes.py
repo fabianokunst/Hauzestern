@@ -5,6 +5,7 @@ Gera as tres variantes de foto de cada colchao:
     assets/produtos/<slug>-branco.jpg     1400x1050   slide 1 do carrossel
     assets/produtos/<slug>-ambiente.jpg   1400x1050   slide 2 (so onde existe)
     assets/produtos/<slug>-cinza.jpg      1400x1050   slide 3
+    assets/produtos/<slug>-detalhe.jpg    1400x1050   slide 4 (so onde existe)
     assets/produtos/<slug>-card.jpg        640x480    card da home (do cinza)
 
 Uso:  python tools/variantes.py            (todos)
@@ -13,6 +14,14 @@ Uso:  python tools/variantes.py            (todos)
 De onde vem cada variante esta na tabela VARIANTES abaixo. 'real' = foto do
 guide. 'emular' = a variante nao existe no guide e e gerada por tools/fundos.py
 a partir da outra variante; essas estao listadas no README.
+
+Material que chegou depois do guide (Krefel, 09/2026) mora em
+documentos/produtos/ — caminhos que comecam por 'documentos/' saem da raiz do
+projeto, os outros de guide_hauzestern/.
+
+Uma entrada 'real' pode ter um terceiro elemento {'recorte': (x0, y0, x1, y1)},
+em fracao da foto original: o enquadramento sai dali em vez do centro. Serve
+para foto vertical ou para detalhe, onde o recorte centrado corta o que importa.
 """
 import os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -30,6 +39,7 @@ TMP = os.path.join(ROOT, '.cache-fundos')
 
 P = 'Produtos/'
 W = 'Colchão Wohl/_Fotos Fundo Infinito/'
+K = 'documentos/produtos/krefel/'
 
 # slug: {variante: ('real', caminho) | ('emular', caminho_origem, kwargs)}
 VARIANTES = {
@@ -93,7 +103,23 @@ VARIANTES = {
    'branco': ('real', P + 'SYLT/COLCHÃO SYLT.jpg'),
    'cinza':  ('real', P + 'SYLT/sylt 01 - quadro pequeno.jpg'),
  },
+ # Krefel: as sete fotos do lancamento sao todas em estudio cinza-claro (~210).
+ # Cinza = o 3/4 sobre a base, cujo sweep (topo ~155, chao ~190) e o do
+ # estudio da marca. Branco = o frontal, emulado; a sombra de contato sai por
+ # ganho abaixo do xadrez (fundos._refaz_chao), senao fica com degrau.
+ # Detalhe = tampo, vivo, etiqueta e xadrez, recortado da foto vertical.
+ 'krefel': {
+   'branco':  ('emular', K + 'COLCHÃO KREFEL C2012 (2).JPG', {'chao': (0.548, 0.585)}),
+   'cinza':   ('real', K + 'COLCHÃO KREFEL C2012.JPG'),
+   'detalhe': ('real', K + 'COLCHÃO KREFEL C2012 (3).JPG', {'recorte': (0, 0.33, 1, 0.83)}),
+ },
 }
+
+
+def caminho(rel):
+    """Foto de origem: documentos/ (material novo) ou guide_hauzestern/."""
+    base = ROOT if rel.startswith('documentos/') else G
+    return os.path.join(base, *rel.split('/'))
 
 
 CATALOGO = ('CATÁLOGO', 'CATÁLOGO 2026', 'Hauzestern_Catalogo_2026_WEB.pdf')
@@ -124,7 +150,7 @@ def do_catalogo(pagina, destino):
     raise RuntimeError(f'sem imagem grande na pagina {pagina + 1} do catalogo')
 
 
-def fit(origem, destino, w, h, q=80):
+def fit(origem, destino, w, h, q=80, recorte=None):
     im = Image.open(origem)
     if im.mode in ('RGBA', 'LA', 'P'):
         im = im.convert('RGBA')
@@ -132,6 +158,10 @@ def fit(origem, destino, w, h, q=80):
         bg.alpha_composite(im)
         im = bg
     im = im.convert('RGB')
+    if recorte:
+        x0, y0, x1, y1 = recorte
+        W0, H0 = im.size
+        im = im.crop((round(x0 * W0), round(y0 * H0), round(x1 * W0), round(y1 * H0)))
     sw, sh = im.size
     k = max(w / sw, h / sh)
     nw, nh = round(sw * k), round(sh * k)
@@ -146,29 +176,31 @@ def gera(slug, spec):
     fontes = {}
     for variante, cfg in spec.items():
         if cfg[0] == 'real':
-            fontes[variante] = (os.path.join(G, *cfg[1].split('/')), 'real')
+            opts = cfg[2] if len(cfg) > 2 else {}
+            fontes[variante] = (caminho(cfg[1]), 'real', opts.get('recorte'))
         elif cfg[0] == 'catalogo':
             alvo = os.path.join(TMP, f'{slug}-{variante}-catalogo.png')
-            fontes[variante] = (do_catalogo(cfg[1], alvo), 'real (catálogo)')
+            fontes[variante] = (do_catalogo(cfg[1], alvo), 'real (catálogo)', None)
         else:
-            origem = os.path.join(G, *cfg[1].split('/'))
+            origem = caminho(cfg[1])
             alvo = os.path.join(TMP, f'{slug}-{variante}.jpg')
             if not os.path.exists(alvo):
                 r = fundos.converte(origem, alvo, variante, **cfg[2])
                 print(f'      emulado {variante}: fundo {r["fundo_antes"]}->'
                       f'{r["fundo_depois"]}, desvio no produto {r["desvio_produto"]:.2f}')
-            fontes[variante] = (alvo, 'EMULADO')
+            fontes[variante] = (alvo, 'EMULADO', None)
 
     saida = os.path.join(ROOT, 'assets', 'produtos')
     marcas = []
-    for variante in ('branco', 'ambiente', 'cinza'):
+    for variante in ('branco', 'ambiente', 'cinza', 'detalhe'):
         if variante not in fontes:
             continue
-        src, tipo = fontes[variante]
-        fit(src, os.path.join(saida, f'{slug}-{variante}.jpg'), 1400, 1050, 80)
+        src, tipo, rec = fontes[variante]
+        fit(src, os.path.join(saida, f'{slug}-{variante}.jpg'), 1400, 1050, 80, rec)
         marcas.append(f'{variante}={tipo}')
     # card da home sai sempre do cinza
-    fit(fontes['cinza'][0], os.path.join(saida, f'{slug}-card.jpg'), 640, 480, 78)
+    src, _, rec = fontes['cinza']
+    fit(src, os.path.join(saida, f'{slug}-card.jpg'), 640, 480, 78, rec)
     return marcas
 
 

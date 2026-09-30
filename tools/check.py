@@ -68,3 +68,18 @@ for d in dup_d: print(f'    {d[:80]}')
 bad_h1 = {p: n for p, n in h1s.items() if n != 1}
 print(f'  páginas sem exatamente um h1: {len(bad_h1)}')
 for p, n in bad_h1.items(): print(f'    {p}: {n}')
+
+print('\n== busca ==')
+import json
+s = io.open('js/busca-index.js', encoding='utf-8').read()
+indice = json.loads(s[s.index('window.HZ_BUSCA=') + 16:].rstrip().rstrip(';'))
+urls = {p['u'] for p in indice['produtos']}
+pdps = {p.replace(os.sep, '/') for p in PAGES if '/' in p.replace(os.sep, '/')}
+problemas = [f'fora do índice: {p}' for p in sorted(pdps - urls)]
+problemas += [f'no índice, sem página: {u}' for u in sorted(urls - pdps)]
+problemas += [f'miniatura inexistente: {p["i"]}' for p in indice['produtos']
+              if p.get('i') and not os.path.exists(p['i'])]
+print(f'  {len(indice["produtos"])} produtos, {len(indice["sugestoes"])} sugestões, '
+      f'{len(s) // 1024}KB')
+for p in problemas: print(f'  {p}')
+if not problemas: print('  índice cobre todas as páginas de produto')

@@ -27,12 +27,23 @@ FONTE DE CADA CAMPO
                     têm tradução em documento nenhum: campo vazio de propósito.
   garantia ........ Fichas Técnica: "Molejo: 1 ano | Demais componentes: 180 dias"
 
+KREFEL (lançamento de 09/2026, posterior ao catálogo 2026)
+  A única fonte é documentos/fichas/Ficha Técnica Krefel.pdf. O que nos outros
+  modelos vem do catálogo sai dela: poetica = quadro amarelo da p.1; tecnica =
+  bloco "COLCHÃO KREFEL"; badges = ícones da p.1; altura = 35 cm (p.2);
+  camadas pela coordenada Y da coluna de rótulos da p.1.
+  Coleção: a ficha NÃO diz. Está em Raízes por inferência — nome tirado de uma
+  cidade (Krefeld) e do que a simboliza (a seda), que é a regra declarada da
+  coleção. Confirmar com a marca.
+
 O QUE NÃO ENTRA
   - Medidas de colchão (largura × comprimento): não constam em nenhum documento.
   - Nomes de base do "Desenvolvimento de Produtos.pdf" (Touch, Luna, Aurora,
     Wave, Netuno, Stella, Awake, Zonare): era uma proposta antiga; as bases que
     existem são C1674, C1705, C1706, C1707/Favo, C1836 e Root.
   - Ficha do Eiche existe no guide, mas o modelo não está no catálogo 2026.
+  - Régua de firmeza da ficha do Krefel ("Confortável"): nenhum outro modelo
+    tem esse dado no site, e a página não tem onde mostrá-lo.
 
 Correções de digitação feitas no texto da marca (só grafia, sem mudar sentido):
   "Construindo através" → "Construído através" (Sylt)
@@ -86,6 +97,18 @@ MAXSPRING_TXT = (
     'sistema, o mais característico provém do alto suporte e conforto ao colchão, o que '
     'resulta em uma resiliência uniforme e perene aos seus usuários mesmo com o passar '
     'do tempo.')
+
+# Ficha Técnica Krefel, p.2 — "MICRO MOLAS ENSACADAS / SISTEMA DE MOLEJO"
+MICRO_MOLAS_TXT = (
+    'Desenvolvida para proporcionar uma adaptação mais precisa aos contornos do corpo e '
+    'elevar a sensação de conforto, esse sistema conta com 400 molas p/m² fabricadas com '
+    'fio de aço especial ATC (alto teor de carbono) de 1,30 mm. A camada de micro molas '
+    'ensacadas é posicionada acima do sistema de molejo principal do colchão. Sua função '
+    'é complementar o suporte estrutural, elevando a experiência de descanso. Por serem '
+    'menores e ensacadas individualmente, as micro molas distribuem o peso de forma '
+    'correta, reduzem os pontos de pressão e respondem de maneira independente aos '
+    'movimentos, oferecendo um acolhimento diferenciado sem comprometer o suporte e o '
+    'alinhamento da coluna.')
 
 ONE_SIDE_TXT = (
     'Colchão Pillow Top One Side possui camada de conforto localizada na parte superior '
@@ -587,6 +610,66 @@ COLCHOES = [
     ],
   },
   {
+    'slug': 'krefel', 'nome': 'Krefel', 'colecao': 'raizes', 'significado': '',
+    'altura': 35, 'capacidade': 150, 'suporte': SUPORTE_PADRAO,
+    'diagrama': None, 'destaque': 'Lançamento',
+    # "Krefeld" (com d) é a cidade; o produto é "Krefel". Os dois como na ficha.
+    'poetica': 'Reconhecida historicamente pela produção têxtil de seda, Krefeld '
+               'inspira um produto que traduz a delicadeza, a suavidade ao toque e a '
+               'elegância desse material natural. Representa, assim, a união entre a '
+               'tradição da seda e uma experiência de conforto refinada.',
+    'tecnica': [
+      'Krefel busca unir a tradição e experiência de conforto refinado. Seu sistema de '
+      'duplo molejo proporciona maior adaptabilidade, ajustando-se às necessidades do '
+      'corpo e oferecendo uma experiência de sono mais confortável e envolvente.',
+    ],
+    'diferenciais': [
+      'CloudCore™ Comfort System é uma espuma de alta resiliência que combina maciez, '
+      'adaptação e suporte inteligente. Adapta-se ao corpo, aliviando pontos de pressão '
+      'e proporcionando uma sensação acolhedora, semelhante à leveza de uma nuvem. Sua '
+      'resiliente recuperação mantém o conforto, a estabilidade e a durabilidade do '
+      'colchão ao longo do tempo. A estrutura conta ainda com uma camada de Látex '
+      'Natural, material nobre, importado da Bélgica, que possui excelente elasticidade '
+      'e suporte corporal.',
+      # "280g/m²" aqui e "203g/m²" na lista de camadas: divergência da própria
+      # ficha, registrada no README. Os dois ficam como a marca publica.
+      'Tecido malha Pure Silk com alto percentual de viscose e seda, com gramatura '
+      '280g/m². A viscose é caracterizada pelas propriedades termorreguladoras que '
+      'auxiliam no conforto durante o sono. O toque macio e acolhedor é proporcionado '
+      'pela seda agregada neste tecido, tornando-o perfeito para uma noite de sono '
+      'tranquila e agradável.',
+    ],
+    # a ficha do Krefel escreve "quando um lado do colchão se movimenta" onde as
+    # outras dizem "recebe o peso do corpo" — por isso o texto próprio
+    'molejo': (
+      'Este sistema de amortecimento conta com 194 molas p/m² fabricadas com o fio de '
+      'aço especial ATC (alto teor de carbono) de 2,20 mm, que proporcionam grande '
+      'amortecimento ao corpo. Por serem ensacadas individualmente, resultam no '
+      'benefício de que, quando um lado do colchão se movimenta, o outro não recebe '
+      'interferência, deixando sua noite muito mais tranquila. A estrutura de molas '
+      'ensacadas é envolta por espumas de várias densidades, divididas em camadas e '
+      'diversas espessuras, a fim de dar todo o suporte necessário à estrutura interna.'),
+    'molejo2_titulo': 'Micro molas ensacadas',
+    'molejo2': MICRO_MOLAS_TXT,
+    'icones_da_ficha': True,        # não está no catálogo 2026
+    'badges': ['Tecido Malha Pure Silk', 'Molas Ensacadas 2.2mm', 'Micro Molas Ensacadas',
+               'Látex Natural', 'One Side Pillow', 'Forro Antiderrapante',
+               'Espuma CloudCORE'],
+    'camadas': [
+      'Tecido 59% Poliéster 39% Viscose 4% Seda 203 g/m²',
+      'Fibra Poliéster',
+      'Espuma Poliuretano Convencional D29 Soft kg/m³ (CloudCORE) — 2 cm',
+      'Micro Molas Ensacadas Individualmente 400 molas p/m² — Arame 1,3 mm — Suporte 80 kg/m²',
+      'Feltro Agulhado',
+      'Camada Látex Natural D70 kg/m³ — 2 cm',
+      'Feltro Agulhado',
+      'Molas Ensacadas Individualmente 194 molas p/m² — Arame 2,2 mm — Suporte 80 kg/m²',
+      'Feltro Resinado',
+      'Espuma Poliuretano Convencional D20 kg/m³ — 7 cm',
+      'Tecido 100% Poliéster 65 g/m² (Antiderrapante)',
+    ],
+  },
+  {
     'slug': 'dorf', 'nome': 'Dorf', 'colecao': 'raizes', 'significado': '',
     'altura': 32, 'capacidade': 150, 'suporte': SUPORTE_PADRAO, 'diagrama': None,
     'poetica': 'É inspirado nas estações gélidas de inverno das vilas germânicas, '
@@ -786,10 +869,13 @@ TRAVESSEIROS = [
 ]
 
 # ------------------------------------------------------------------------ bases
-# Fontes: CATÁLOGO 2026 p.41 (as seis bases) e
-#         Fichas Técnica/PDF/Boxes/*.pdf (C1705, C1706, C1707 e Root).
-# C1674 e C1836 aparecem só no catálogo — as páginas deles são mais curtas
-# de propósito, com o que existe.
+# Fontes: CATÁLOGO 2026 p.41 (as seis bases),
+#         Fichas Técnica/PDF/Boxes/*.pdf (C1705, C1706, C1707 e Root) e
+#         documentos/fichas/Ficha Técnica Box C1836.pdf (chegou em 09/2026).
+# C1674 aparece só no catálogo — a página dele é mais curta de propósito,
+# com o que existe.
+# 'suporte' só onde a ficha dá a carga: a do C1836 diz "Box Rígido suporte
+# até 350kg"; as outras fichas não estão aqui para conferir.
 BASE_ESTRUTURA = (
     'Estrutura em Madeira de Eucalipto classificada, oriunda de reflorestamento, seca em '
     'estufa antes de ser beneficiada. Sua parte superior conta com Chapa Laminada de '
@@ -831,8 +917,9 @@ BASES = [
   },
   {
     'slug': 'box-c1836', 'nome': 'Box C1836', 'ref': 'C1836', 'colecao': '',
-    'significado': '', 'foto': None, 'ficha': False,
+    'significado': '', 'foto': 'box-c1836', 'ficha': True,
     'box': '20 cm', 'pes': '14 cm', 'material': 'Pés de madeira',
+    'suporte': 'até 350 kg',
     'poetica': '',
   },
   {

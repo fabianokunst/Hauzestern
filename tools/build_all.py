@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Gera o site inteiro: home, produtos, garantia, representantes, sitemap.
+Gera o site inteiro: home, produtos, garantia, representantes, índice da
+busca, sitemap.
 
     python tools/build_all.py
 
@@ -17,6 +18,7 @@ import build_pages as BP
 import build_home
 import build_garantia
 import build_representantes
+import build_busca
 
 HOJE = datetime.date.today().isoformat()
 
@@ -62,6 +64,12 @@ if __name__ == '__main__':
     for t in dados.TRAVESSEIROS:
         BP.write(f'travesseiros/{t["slug"]}.html', BP.pdp_travesseiro(t, dados.TRAVESSEIROS))
     print(f'  {len(dados.TRAVESSEIROS)} páginas')
+
+    print('— busca —')
+    js, n, avisos = build_busca.build()
+    print(f'  {build_busca.ARQUIVO} {BP.write(build_busca.ARQUIVO, js) // 1024}KB — {n} produtos')
+    for a in avisos:
+        print('  aviso: ' + a)
 
     print('— sitemap —')
     n = 3 + len(dados.COLCHOES) + len(dados.BASES) + len(dados.TRAVESSEIROS)

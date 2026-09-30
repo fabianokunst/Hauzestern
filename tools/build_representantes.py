@@ -22,9 +22,12 @@ P = ''                       # pagina na raiz: sem prefixo de caminho
 URL = BP.SITE + '/representantes.html'
 
 TITULO = 'Representantes Hauzestern — contatos por estado | Hauzestern Colchões'
+# Sem afirmacao de cobertura nacional: a rede nao cobre as 27 UFs, e o numero
+# muda a cada importacao da planilha. O resumo do topo da pagina ja mostra a
+# cobertura real, calculada dos dados.
 DESCRICAO = ('Encontre o representante comercial Hauzestern do seu estado: '
-             'telefone, e-mail e área de atuação em todo o Brasil, dos '
-             'escritórios próprios às representações parceiras.')
+             'telefone, e-mail e área de atuação, dos escritórios próprios '
+             'às representações parceiras.')
 
 
 def sem_acento(s):

@@ -1,0 +1,23 @@
+# O repositório é público e publicado pelo GitHub Pages: tudo o que entra aqui
+# fica acessível a qualquer pessoa. Ver "Publicação" no CLAUDE.md.
+
+# dados internos — nunca publicar
+/representantes.csv
+*.xlsx
+*.xls
+documentos/
+chamado/
+guide_hauzestern/
+atividades/
+
+# insumo de build reproduzível e versões antigas
+.cache-fundos/
+_arquivo/
+\#template-inicial/
+
+# local
+.claude/
+__pycache__/
+*.pyc
+Thumbs.db
+desktop.ini

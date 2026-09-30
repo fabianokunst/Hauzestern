@@ -253,11 +253,57 @@ def _refina_borda(rgb, prod_grosso, tol, grad_max, sat_max, resgata_claro,
     return prod, _estima_fundo(L, ~prod), L
 
 
+def _refaz_chao(rgb, final, L, alvo, faixa, sat_lo=6, sat_hi=16):
+    """Recompoe o chao abaixo de `faixa` por GANHO, nao por soma.
+
+    A mascara normal trata a sombra de contato como produto: ela e escura
+    demais para ficar a `tol` do fundo e a transicao para o chao tem gradiente
+    alto demais para contar como lisa. O resultado e um degrau onde a penumbra
+    encontra o fundo novo. No chao, abaixo do produto, o que existe e so luz
+    sobre uma superficie neutra; trocar o tom dessa superficie e multiplicar
+    pela razao alvo/estimado. Assim a sombra inteira acompanha o fundo novo, do
+    nucleo escuro a penumbra, sem mascara.
+
+    So pixels neutros entram (peso cai de 1 a 0 entre `sat_lo` e `sat_hi`):
+    os pes de madeira sao saturados e ficam com o resultado normal. A faixa so
+    pode comecar abaixo de qualquer parte clara e neutra do produto — o tampo
+    branco e o tecido xadrez tambem sao neutros. Tecido escuro pode ficar
+    dentro: o ganho (~1,2) num pixel de L 20 da L 24, imperceptivel.
+
+    `faixa` = (inicio, fim) em fracao da altura: o peso sobe de 0 a 1 nesse
+    intervalo, para a passagem do resultado normal para o ganho nao deixar
+    emenda na penumbra. Um numero so = comeco seco.
+    Devolve a imagem e a mascara da faixa tocada.
+    """
+    h, w = L.shape
+    sat = rgb.max(axis=2) - rgb.min(axis=2)
+    ini, fim = faixa if isinstance(faixa, (tuple, list)) else (faixa, faixa)
+    y = np.arange(h, dtype=np.float32)[:, None] / h
+    rampa = np.clip((y - ini) / max(fim - ini, 1e-6), 0, 1)
+    zona = np.broadcast_to(y >= ini, (h, w))
+    peso = np.clip((sat_hi - sat) / float(sat_hi - sat_lo), 0, 1) * rampa
+    # chao limpo = neutro e no tom das margens da mesma linha; a estimativa
+    # extrapola por baixo da sombra a partir dele
+    margens = np.r_[0:int(w * .1), int(w * .9):w]
+    ref = np.median(L[:, margens], axis=1)[:, None]
+    limpo = zona & (sat < sat_lo) & (np.abs(L - ref) < 6)
+    est = _estima_fundo(L, limpo)
+    mult = np.clip(rgb * (alvo / np.maximum(est, 1))[:, :, None], 0, 255)
+    p = peso[:, :, None]
+    return final * (1 - p) + mult * p, peso > 0
+
+
 # ---------------------------------------------------------------- conversao
 def converte(entrada, saida, para='cinza', largura=2800, altura=2100,
              tol=11, grad_max=2.2, sat_max=34, resgata_claro=None,
-             encolhe=1, feather=1.2, qualidade=93, tolera_produto=2.0):
-    """Grava em `saida` a foto no fundo `para`, em `largura`x`altura` (4:3)."""
+             encolhe=1, feather=1.2, qualidade=93, tolera_produto=2.0,
+             chao=None):
+    """Grava em `saida` a foto no fundo `para`, em `largura`x`altura` (4:3).
+
+    `chao` (opcional, fracao da altura ou par (inicio, fim) de rampa): dali
+    para baixo, recompoe o chao e a sombra de contato por ganho — ver
+    _refaz_chao. Usar so quando a sombra sai com degrau.
+    """
     trabalho = _recorta(Image.open(entrada), largura, altura)
     rgb = np.asarray(trabalho).astype(np.float32)
 
@@ -282,6 +328,9 @@ def converte(entrada, saida, para='cinza', largura=2800, altura=2100,
     final = np.clip(rgb + delta, 0, 255)
 
     nucleo = alpha > .995
+    if chao is not None:
+        final, tocado = _refaz_chao(rgb, final, L, alvo, chao)
+        nucleo &= ~tocado       # a sombra deixou de ser "produto"
     desvio = 0.0
     if nucleo.sum() > 500:
         desvio = abs(float(final.mean(axis=2)[nucleo].mean()) - float(L[nucleo].mean()))
