@@ -22,6 +22,11 @@ HOJE = datetime.date.today().isoformat()
 TEL_HREF = 'tel:+555135648300'
 TEL_TXT = '(51) 3564-8300'
 
+# Google Analytics 4: ID de medicao da propriedade (G-...). Nao e segredo, vai
+# no HTML de todo site com GA. Vazio = paginas sem tag. A mesma propriedade
+# mede a homologacao (github.io) e o dominio oficial.
+GA_ID = ''
+
 IG = 'https://www.instagram.com/hauzestern/'
 IG_SVG = ('<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">'
           '<path fill="currentColor" d="M12 2.2c3.2 0 3.6 0 4.9.07 1.2.05 1.8.25 2.2.42.6.22 1 .48 1.4.9'
@@ -115,6 +120,27 @@ def carrossel(p, slug, nome, alt_base, pasta='produtos', flag=''):
 
 
 # --------------------------------------------------------------------- <head>
+def ga():
+    """Tag do GA4. Aberto direto do disco (file://) nao mede: o endereco
+    levaria a pasta do computador e o cookie nao grava."""
+    if not GA_ID:
+        return ''
+    return f'''<script>
+(function () {{
+  if (location.protocol === 'file:') return;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () {{ dataLayer.push(arguments); }};
+  gtag('js', new Date());
+  gtag('config', '{GA_ID}');
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id={GA_ID}';
+  document.head.appendChild(s);
+}})();
+</script>
+'''
+
+
 def head(p, title, desc, canon, og_img, og_type='website', ld=(), extra=''):
     j = '\n'.join('<script type="application/ld+json">\n%s\n</script>'
                   % json.dumps(o, ensure_ascii=False, indent=2) for o in ld)
@@ -124,7 +150,7 @@ def head(p, title, desc, canon, og_img, og_type='website', ld=(), extra=''):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>document.documentElement.classList.add('js')</script>
-<title>{esc(title)}</title>
+{ga()}<title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
 <link rel="canonical" href="{canon}">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">

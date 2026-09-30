@@ -391,8 +391,30 @@ Atalhos: `/` ou `Ctrl+K` abrem, setas navegam, `Enter` abre o produto, `Esc` fec
   (`file://`), onde o navegador bloqueia `fetch()` de arquivo local.
 - **Sugestões** da busca vazia ficam em `SUGESTOES` no `build_busca.py`; o build
   descarta (e avisa) a que não encontrar produto.
-- Sem JavaScript a lupa não aparece. Não há registro do que as pessoas buscam —
-  isso fica para quando o site tiver analytics.
+- Sem JavaScript a lupa não aparece.
+- **Medição.** Com o GA ligado (ver [Analytics](#analytics-ga4)), cada busca vira
+  um evento `search` no GA4.
+
+## Analytics (GA4)
+
+- **Tag.** Sai de `head()` em `tools/build_pages.py`, portanto vai em todas as
+  páginas. O ID de medição fica em `GA_ID`, no mesmo arquivo. Com `GA_ID` vazio,
+  as páginas saem sem tag. O ID não é segredo, vai no HTML de qualquer site com GA.
+- **Uma propriedade só** mede a homologação (github.io) e, depois, o domínio
+  oficial. As visitas de teste entram nos relatórios (decisão do Fabiano em
+  2026-09-30). Para separar depois, filtre pela dimensão "Nome do host".
+- Página aberta direto do disco (`file://`) não mede: o endereço levaria a pasta
+  do computador e o cookie não grava.
+- **Busca** (`js/busca.js`, seção 6): evento `search` com `search_term` (em
+  minúsculas), `resultados` (quantos produtos) e `achou` (`todos os termos`,
+  `termo parecido`, `parte dos termos`, `nada`). Os dois últimos valores mostram
+  o que o catálogo não tem. O evento sai quando a pessoa para de digitar por
+  1,5 s, escolhe um produto ou fecha a busca, e o mesmo termo em seguida não
+  repete. `resultados` e `achou` só aparecem nos relatórios depois de cadastrados
+  no GA como dimensões personalizadas (Administrador → Definições
+  personalizadas, escopo "Evento").
+- **Ainda sem consentimento de cookies.** Antes do domínio oficial, alinhar com o
+  jurídico/DPO da Herval o banner de cookies e a política de privacidade (LGPD).
 
 ## Representantes
 
@@ -540,7 +562,9 @@ Além das divergências listadas na auditoria:
   inventa o 9. Corrigir na planilha.
 - **Catálogo em PDF para download**: definir se o `Hauzestern_Catalogo_2026_WEB.pdf`
   vai ficar público e onde.
-- Analytics (GA4 / Tag Manager) ainda não incluído.
+- **Analytics**: a tag está pronta mas desligada até chegar o ID `G-…` da
+  propriedade (`GA_ID` em `tools/build_pages.py`). Antes do domínio oficial:
+  banner de cookies e política de privacidade. Ver [Analytics](#analytics-ga4).
 - `assets/logo-hauzestern*.png` e `logo-marca.png` são os logos antigos, extraídos
   do site anterior. Ficaram na pasta mas não são mais usados.
 - `_harness.html` na raiz é arquivo temporário de ferramenta — pode apagar.

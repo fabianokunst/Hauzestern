@@ -14,6 +14,7 @@
    3. Busca e pontuacao
    4. Destaque do termo
    5. Painel
+   6. Medicao (GA4)
    ========================================================= */
 (function () {
   'use strict';
@@ -414,6 +415,7 @@
 
     campoBusca.addEventListener('input', atualiza);
     campoBusca.addEventListener('keydown', teclas);
+    lista.addEventListener('click', envia);
     dlg.querySelector('.busca-fechar').addEventListener('click', fecha);
     /* clique no fundo escuro (fora do painel) fecha */
     dlg.addEventListener('click', function (e) { if (e.target === dlg) fecha(); });
@@ -465,6 +467,7 @@
   }
 
   function aoFechar() {
+    envia();
     document.documentElement.classList.remove('busca-aberta');
     Array.prototype.forEach.call(botoes, function (b) { b.setAttribute('aria-expanded', 'false'); });
     /* foco volta para quem abriu; aberto pelo atalho (foco no body) ou no
@@ -534,6 +537,7 @@
     if (!INDICE) return;
     var q = campoBusca.value;
     var r = q.trim() ? busca(q) : null;
+    registra(r ? q : '', r);
     lista.textContent = '';
     ativo = -1;
     campoBusca.removeAttribute('aria-activedescendant');
@@ -603,9 +607,42 @@
       e.preventDefault();
       var a = ops[ativo >= 0 ? ativo : 0] && ops[ativo >= 0 ? ativo : 0].querySelector('a');
       if (!a) return;
+      envia();
       if (e.ctrlKey || e.metaKey) window.open(a.href, '_blank');
       else location.href = a.href;
     }
+  }
+
+  /* ---------- 6. Medicao (GA4) ---------- */
+  /* Com o GA na pagina (tools/build_pages.py, GA_ID), cada busca vira um
+     evento 'search' com o termo, o numero de resultados e o quanto do termo
+     foi achado ('nada' e 'parte dos termos' sao o que o catalogo nao tem).
+     Espera a pessoa parar de digitar, para nao registrar letra a letra, e
+     sai antes se ela escolhe um produto ou fecha a busca. */
+  var pendente = null, espera, ultimo = '';
+
+  function registra(q, r) {
+    if (!window.gtag) return;
+    clearTimeout(espera);
+    q = q.trim().replace(/\s+/g, ' ').toLowerCase();
+    pendente = q.length >= 2 && r ? {
+      q: q,
+      n: r.itens.length,
+      achou: !r.itens.length ? 'nada'
+        : r.modo === 'algum' ? 'parte dos termos'
+        : r.aproximado ? 'termo parecido' : 'todos os termos'
+    } : null;
+    if (pendente) espera = setTimeout(envia, 1500);
+  }
+
+  function envia() {
+    clearTimeout(espera);
+    if (!pendente || !window.gtag) return;
+    var p = pendente;
+    pendente = null;
+    if (p.q === ultimo) return;   /* reabriu a busca com o mesmo texto */
+    ultimo = p.q;
+    window.gtag('event', 'search', { search_term: p.q, resultados: p.n, achou: p.achou });
   }
 
   /* ---------- gatilhos ---------- */

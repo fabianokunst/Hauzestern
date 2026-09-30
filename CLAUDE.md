@@ -76,5 +76,6 @@ no disco no meio do trabalho.
   cobertura nacional em texto de SEO.
 - Material novo da marca chega em `chamado/` (pasta temporária) e é copiado para
   `documentos/fichas/` e `documentos/produtos/<modelo>/`.
-- Sem analytics por enquanto.
+- Analytics: GA4, com o ID em `GA_ID` (`tools/build_pages.py`) e a busca medida
+  em `js/busca.js`. Detalhes na seção "Analytics (GA4)" do `README.md`.
 - Conferência geral: `python tools/check.py`.
