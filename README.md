@@ -14,8 +14,9 @@ correspondente simplesmente não aparece na página. Ver
 index.html                    home
 garantia.html                 garantia, cuidados e tabela de biotipos
 representantes.html           rede comercial por estado (gerada do CSV)
-colchoes/<modelo>.html        14 PDPs (berg, dorf, eibsee, frost, gipfel, hemmen,
-                              himmel, mond, motte, nebel, sylt, wachen, wohl, zonen)
+colchoes/<modelo>.html        15 PDPs (berg, dorf, eibsee, frost, gipfel, hemmen,
+                              himmel, krefel, mond, motte, nebel, sylt, wachen, wohl,
+                              zonen)
 bases/<modelo>.html            6 PDPs (box-root, box-c1674, box-c1705, box-c1836,
                               box-c1706, box-favo)
 travesseiros/<modelo>.html     5 PDPs (alpen, harz, weich, mh7618, mh7619)
@@ -24,11 +25,14 @@ sitemap.xml  robots.txt  site.webmanifest
 favicon.svg  favicon.ico
 css/style.css                 estilos — tokens de marca no :root
 js/main.js                    header ao rolar, menu mobile, submenu, reveal, ano
+js/busca.js                   busca de produtos (lupa do header) — ver "Busca"
+js/busca-index.js             índice da busca, GERADO de tools/dados.py
 assets/
   brand/                      marca em SVG (ver "Marca")
   produtos/<slug>-branco.jpg  slide 1 do carrossel (1400×1050)
   produtos/<slug>-ambiente.jpg slide 2 — só Wohl e Hemmen
   produtos/<slug>-cinza.jpg   slide 3
+  produtos/<slug>-detalhe.jpg slide 4 — só Krefel (close do acabamento)
   produtos/<slug>-card.jpg    card da home, sempre do cinza (640×480)
   bases/<slug>.jpg            idem
   travesseiros/<slug>.jpg     960×720 + -card 480×360
@@ -39,11 +43,19 @@ assets/
 tools/                        geradores (rodam no dev, não no navegador)
 _arquivo/                     páginas retiradas do site — ver _arquivo/LEIA-ME.txt
 guide_hauzestern/             material da marca (não publicar)
+documentos/                   material da marca que chegou depois do guide (não publicar)
+  fichas/                     Ficha Técnica Krefel.pdf, Ficha Técnica Box C1836.pdf
+  produtos/krefel/            as 7 fotos originais do Krefel (fonte de variantes.py)
+  produtos/box-c1836/         foto original do C1836 (fonte de build_assets.py)
 ```
+
+As fotos e fichas de `documentos/` são os **originais** — os geradores leem
+delas. Vieram da pasta `chamado/` (09/2026), que pode ser apagada: tudo o que o
+site usa já foi copiado para cá, byte a byte.
 
 ## Como editar
 
-O HTML das 28 páginas é **gerado** a partir de duas fontes: `tools/dados.py`
+O HTML das 29 páginas é **gerado** a partir de duas fontes: `tools/dados.py`
 (produtos, garantia, textos institucionais) e `representantes.csv` (rede
 comercial).
 
@@ -55,26 +67,34 @@ python tools/build_all.py
 python tools/check.py
 ```
 
-Se as imagens do guide mudarem:
+Se as imagens do guide (ou de `documentos/produtos/`) mudarem:
 
 ```bash
-python tools/variantes.py        # 3 variantes de cada colchão (~2 min)
+python tools/variantes.py        # variantes de cada colchão (~2 min)
+python tools/variantes.py krefel # só um modelo
 python tools/build_assets.py     # travesseiros, bases, fábrica, lifestyle
 ```
 
+Sem o `guide_hauzestern/` na máquina: `build_assets.py` pula o que falta
+("!! ausente") e não toca nos assets já gerados, então refaz só o C1836;
+`variantes.py` sem argumento para no primeiro modelo do guide — rode
+`python tools/variantes.py krefel`, que vem de `documentos/`.
+
 | Script | O que faz |
 |---|---|
-| `tools/dados.py` | **a fonte da verdade**: 14 colchões, 6 bases, 5 travesseiros, garantia |
+| `tools/dados.py` | **a fonte da verdade**: 15 colchões, 6 bases, 5 travesseiros, garantia |
+| `tools/importar_representantes.py` | importa a planilha `.xlsx` nova para `representantes.csv`, com diff e validação |
 | `tools/dados_representantes.py` | lê `representantes.csv` e normaliza a rede comercial |
-| `tools/build_all.py` | gera home + garantia + representantes + 25 PDPs + sitemap |
+| `tools/build_all.py` | gera home + garantia + representantes + 26 PDPs + índice da busca + sitemap |
 | `tools/build_home.py` | só a home (textos institucionais e tecnologias ficam aqui) |
 | `tools/build_garantia.py` | só a garantia (transcrição do certificado) |
 | `tools/build_representantes.py` | só a página de representantes |
 | `tools/build_pages.py` | PDPs + `head`/`header`/`footer` compartilhados |
+| `tools/build_busca.py` | só o índice da busca (`js/busca-index.js`) |
 | `tools/build_assets.py` | prepara travesseiros, bases, processo e lifestyle |
 | `tools/variantes.py` | as 3 variantes de foto de cada colchão (única fonte de `assets/produtos/`) |
 | `tools/fundos.py` | troca o fundo de estúdio cinza ⇄ branco, quando a variante não existe |
-| `tools/check.py` | links quebrados, assets órfãos, títulos duplicados, `h1` |
+| `tools/check.py` | links quebrados, assets órfãos, títulos duplicados, `h1`, cobertura da busca |
 
 Ajustes pontuais de layout podem ser feitos direto no HTML — mas serão sobrescritos
 no próximo `build_all`. Mudança que precisa durar vai no gerador.
@@ -125,6 +145,17 @@ Elementos. Nada dele entrou no site.
 **Destaques.** Comparando o catálogo 2025 com o 2026, os lançamentos atuais são
 Gipfel e Wohl. Eibsee é de 2025 e perdeu o selo de destaque.
 
+**Krefel (lançamento de 09/2026).** Posterior ao catálogo 2026: a única fonte é a
+ficha técnica (`documentos/fichas/`). O que nos outros vem do catálogo — texto de
+abertura, ícones, altura — saiu dela; a ordem das 11 camadas foi extraída pela
+coordenada Y da coluna de rótulos, como nos outros. Tem selo "Lançamento" e
+ocupa o bloco de lançamento da home (`LANCAMENTO` em `tools/build_home.py`),
+que antes era do Wohl. O segundo molejo é de **micro molas ensacadas** (400
+molas p/m², arame 1,30 mm), e não MaxSpring: a PDP usa o título que vem de
+`molejo2_titulo`. Na home, o card "Látex natural e Flexxi Cup" passou a casar só
+com "Flexxi" — o texto é da manta de 8 cm do Frost, não da camada de 2 cm do
+Krefel.
+
 ### Divergências dentro do próprio material da marca
 
 Estas precisam de decisão da marca — o site mostra a versão mais recente e a
@@ -138,6 +169,7 @@ divergência está registrada:
 | Faixa de altura na tabela de biotipos | certificado: `1,15 a 1,68` | sequência lógica seria `1,51 a 1,60` | como está impresso |
 | Frost, tradução | Storytelling: "orvalho" | em alemão *Frost* é geada | "orvalho", como a marca escreve |
 | Ficha do Hemmen | contém um parágrafo sobre "vilas germânicas" | esse texto é do Dorf | não usado |
+| Tecido do Krefel | lista de camadas: `59% Poliéster 39% Viscose 4% Seda 203g/m²` (soma 102%) | "Diferenciais": malha Pure Silk de `280g/m²` — a mesma do Hemmen e do Motte, que é 59/37/4 e 280 | os dois, como a marca publica |
 
 Correções de grafia feitas no texto da marca, sem mudar sentido:
 `Construindo através` → `Construído através`, `contém por característica` →
@@ -172,8 +204,13 @@ só uma, a outra é **emulada** por `tools/fundos.py`.
 | Berg | **emulado** | — | real |
 | Eibsee | real | — | real |
 | Sylt | real | — | real |
+| Krefel | **emulado** (do frontal) | — | real (3/4) + detalhe real |
 
-São **8 variantes emuladas e 20 reais** — todas as 8 na direção cinza→branco. **Ambientada existe só para Wohl e Hemmen**
+São **9 variantes emuladas e 21 reais** — todas as 9 na direção cinza→branco.
+O Krefel é o único com um quarto slide, de **detalhe** (tampo, vivo, etiqueta e
+lateral xadrez), recortado da foto vertical `(3)` com `recorte` em
+`tools/variantes.py`. As sete fotos do Krefel são de estúdio cinza-claro (~210);
+a do 3/4 tem o sweep do estúdio da marca (topo ~155, chão ~190) e é a cinza real. **Ambientada existe só para Wohl e Hemmen**
 (`familia Wohl.png` e `familia Hemmen.png`); os outros 12 modelos ficam com dois
 slides. Não usei as aberturas de coleção do catálogo como ambientada porque elas
 mostram um colchão específico, que não é o do modelo em questão.
@@ -207,7 +244,16 @@ fundo, não por polinômio: o sweep tem chão claro (~195) e laterais escuras (~
 37 níveis de amplitude, muito acima de qualquer tolerância útil.
 
 A conversão **se autoconfere**: se o brilho médio dentro do produto mudar mais de 2
-níveis, ela falha e não grava. Nas 8 emulações o desvio ficou em 0,00.
+níveis, ela falha e não grava. Nas 9 emulações o desvio ficou em 0,00.
+
+**Sombra de contato por ganho (Krefel).** No frontal do Krefel a sombra embaixo
+da base é escura demais para a máscara tratá-la como fundo, e a penumbra tem
+gradiente alto demais para contar como lisa — saía um degrau duro entre o cinza
+e o branco. Com `chao=(0.548, 0.585)`, do fim do xadrez para baixo o chão é
+recomposto por **multiplicação** (`saída = I · alvo / estimado`) nos pixels
+neutros: a sombra inteira acompanha o fundo novo, do núcleo escuro à penumbra,
+sem máscara. Os pés de madeira são saturados e ficam fora; a entrada é em rampa
+para não deixar emenda. Desligado por padrão — as outras 8 não mudam.
 
 Um caso exigiu troca de origem: a foto `_D3A9225` do **Wohl** tem vinheta forte e a
 segmentação não fecha. A emulação sai de `_D3A9205`, outro ângulo real do mesmo
@@ -284,7 +330,9 @@ Com um kit da Adobe Fonts, trocar **apenas** `--font-display`.
 | Sistema de molejo (194 molas ATC; MaxSpring 206 monobloco) | `Fichas Técnica/PDF/*.pdf` |
 | Sistema Thermo Flow do Wohl | `Colchão Wohl/_Ficha Técnica/Manual Sistema Thermo Flow_1125-2.pdf` |
 | Bases: alturas e pés | `CATÁLOGO 2026`, p.41 |
-| Bases: estrutura e revestimento | `Fichas Técnica/PDF/Boxes/*.pdf` (C1705, C1706, C1707, Root) |
+| Bases: estrutura e revestimento | `Fichas Técnica/PDF/Boxes/*.pdf` (C1705, C1706, C1707, Root) + `documentos/fichas/Ficha Técnica Box C1836.pdf` |
+| Box C1836: suporte até 350 kg, foto | `documentos/fichas/` e `documentos/produtos/box-c1836/` |
+| Krefel, tudo | `documentos/fichas/Ficha Técnica Krefel.pdf` e `documentos/produtos/krefel/` |
 | Travesseiros | `CATÁLOGO 2026`, p.40 |
 | Página de garantia, integral | `Certificado de Garantia/2-Hauzestern_Certificado de garantia_2023_AF (1).pdf` |
 | Representantes, prepostos e assistentes por estado | `representantes.csv` (planilha comercial, na raiz) |
@@ -311,15 +359,89 @@ Colchões, Bases, Travesseiros. No desktop abre no hover, no foco do teclado e n
 no mobile, dentro do painel de tela cheia, abre no toque. `Esc` fecha e devolve
 o foco ao botão.
 
+Entre 1001 px (onde o burger some) e 1239 px o menu completo não cabe ao lado
+do logotipo: nessa faixa ele aperta os espaçamentos e o Instagram fica só no
+ícone (o texto segue no link para leitor de tela). O logotipo nunca encolhe —
+antes dessa regra ele era espremido para 41 px a 1001 px.
+
+## Busca
+
+A lupa do header (todas as páginas; no mobile, ao lado do burger) abre um
+painel que busca **só produtos** — os 26, por nome, código e qualquer
+característica que a página mostra: tecnologias, camadas, altura, capacidade,
+suporte, medidas, pés, material, ficha, garantia e os textos de descrição.
+Atalhos: `/` ou `Ctrl+K` abrem, setas navegam, `Enter` abre o produto, `Esc` fecha.
+
+- **Índice gerado.** `tools/build_busca.py` monta `js/busca-index.js` a partir
+  de `tools/dados.py` a cada `build_all` — produto novo entra sozinho, e nada
+  no índice é texto escrito à parte. Campo novo em `dados.py` que o gerador
+  ainda não conhece é indexado mesmo assim, e o build avisa
+  (`aviso: campo "x" (slug) indexado sem tratamento próprio`) para decidir se ele
+  merece peso próprio. `check.py` confere que toda PDP está no índice e que toda
+  miniatura existe.
+- **Pesos.** Nome > código/coleção/significado > características > descrição.
+  Busca sem acento e sem plural (`colchoes` = colchão), aceita código e medida
+  colados ou separados (`c1705`, `MH7618`, `d45`, `38cm`, `68x47`) e tolera um
+  erro de digitação (`himel`, `maxpring`) quando o termo não acha nada.
+  "Colchão", "base/box" e "travesseiro" filtram a categoria: `colchão látex` não
+  traz o travesseiro de látex. Se nenhum produto tem todos os termos, mostra os
+  que têm mais, avisando.
+- **Carregamento.** O índice (~57 KB) só é baixado quando a pessoa chega perto
+  da lupa. É `.js` e não `.json` porque o site também abre direto do disco
+  (`file://`), onde o navegador bloqueia `fetch()` de arquivo local.
+- **Sugestões** da busca vazia ficam em `SUGESTOES` no `build_busca.py`; o build
+  descarta (e avisa) a que não encontrar produto.
+- Sem JavaScript a lupa não aparece. Não há registro do que as pessoas buscam —
+  isso fica para quando o site tiver analytics.
+
 ## Representantes
 
 `representantes.html` é gerada de `representantes.csv` — a planilha comercial
 exportada do Excel, em CP-1252, com células multilinha. Ela substituiu o bloco
 "Onde encontrar" da home: quem quer comprar fala com o representante da região.
 
-São 55 áreas de atuação em 27 UFs (26 estados + DF), agrupadas por região do
+### Quando chega planilha nova
+
+O comercial manda um `.xlsx` de tempo em tempo. Não edite o CSV à mão:
+
+```bash
+python tools/importar_representantes.py --dry-run "atividades/REPRES. HAUZESTERN.xlsx"
+python tools/importar_representantes.py --build   "atividades/REPRES. HAUZESTERN.xlsx"
+```
+
+`--dry-run` só mostra o diff; `--build` importa e já regenera a página.
+Sem nenhuma das duas, importa e avisa para rodar `build_representantes.py`.
+
+O importador lê o `.xlsx` com a biblioteca padrão (não precisa de openpyxl) e,
+antes de escrever, **mostra o que muda**: quais áreas entram, quais saem, quais
+tiveram contato alterado (campo por campo, antes/depois) e — o aviso que mais
+importa — **quais UFs ficam sem nenhum representante** e por isso desaparecem da
+página inteira, card e seletor.
+
+Ele **recusa a importação** em dois casos, porque os dois fariam um representante
+sumir em silêncio:
+
+- **UF inexistente** (`SVP` em vez de `SP`) — `dados_representantes.py` descarta
+  linha com UF desconhecida sem reclamar;
+- **cabeçalho fora da ordem esperada** — as 11 colunas são lidas por posição, não
+  por nome, então uma coluna trocada de lugar embaralharia tudo.
+
+Também avisa (sem impedir) linha sem `EQUIPE DE VENDAS` ou sem `REPRESENTANTE`,
+e recusa caractere que não exista em CP-1252. Ao final, relê o CSV com o próprio
+gerador e confere que as linhas viraram registros.
+
+A versão anterior do CSV vai para `_arquivo/representantes-AAAA-MM-DD.csv` —
+é o único registro dos contatos que saíram do site. Cópia idêntica não é
+arquivada.
+
+São 33 áreas de atuação em 21 UFs (20 estados + DF), agrupadas por região do
 IBGE. Cada card traz a área coberta, a equipe de vendas e os contatos —
 representante, prepostos e assistentes comerciais, com telefone e e-mail.
+
+**AL, CE, PB, PI, RR e SE não têm representante** na planilha atual e por isso
+não aparecem na página — nem como card, nem no seletor de UF (o gerador monta o
+`select` só com as UFs presentes nos dados). Se voltarem à planilha, voltam
+sozinhos ao rebuild.
 
 `tools/dados_representantes.py` separa nome, telefone e e-mail de cada célula
 sem inventar nada:
@@ -341,9 +463,9 @@ grafia foi corrigida (`ESCRÍTOR. CAPITAL RN` → Escritório Capital RN,
 CONQUISTA` → Vitória da Conquista, `TRIANGULO MINEIRO` → Triângulo Mineiro).
 Siglas e UFs ficam em caixa alta.
 
-**A coluna COLCHOES não é usada.** Só 43 das 55 linhas têm o `X`, mas o
-comercial confirmou que toda a rede atende colchões — o `X` não distingue nada
-no nosso contexto. As 55 linhas entram iguais, sem selo e sem ressalva.
+**A coluna COLCHOES não é usada.** Na planilha atual todas as 33 linhas têm o
+`X` — o campo não distingue nada no nosso contexto. As 33 linhas entram iguais,
+sem selo e sem ressalva.
 
 **Filtro.** Busca por texto, seletor de UF e chips de região, tudo no cliente (`js/main.js`, seção 7). Títulos de estado e de região
 somem quando ficam sem card. `representantes.html#uf-sp` já abre a página
@@ -352,10 +474,10 @@ completa fica visível.
 
 ## SEO
 
-- `title` e `meta description` únicos nas 28 páginas (verificado por `tools/check.py`)
+- `title` e `meta description` únicos nas 29 páginas (verificado por `tools/check.py`)
 - `canonical` absoluto e um único `h1` por página
 - **JSON-LD**: `Organization` (com `parentOrganization` Grupo Herval, endereço e
-  telefone) + `ItemList` das 25 URLs de produto na home; `Product` +
+  telefone) + `ItemList` das 26 URLs de produto na home; `Product` +
   `BreadcrumbList` em cada PDP; `WebPage` + `BreadcrumbList` + `FAQPage` na garantia;
   `WebPage` + `BreadcrumbList` em representantes
 - Open Graph e Twitter Card por página, com a foto do próprio produto
@@ -363,13 +485,14 @@ completa fica visível.
 - `fetchpriority="high"` na imagem principal da PDP e do hero
 - Sem JS, o conteúdo aparece: `main.js` adiciona `.js` no `<html>` e só então o CSS
   esconde os `.reveal`
-- `sitemap.xml` com 28 URLs, `robots.txt` bloqueando `_arquivo/`,
-  `guide_hauzestern/`, `tools/` e `representantes.csv`
+- `sitemap.xml` com 29 URLs, `robots.txt` bloqueando `_arquivo/`,
+  `guide_hauzestern/`, `documentos/`, `chamado/`, `tools/` e `representantes.csv`
 
-**Ao publicar, não subir `representantes.csv`.** O `robots.txt` já o bloqueia,
-mas robots não é controle de acesso: a planilha traz códigos de faturamento e de
-cliente que ficaram deliberadamente fora da página. O arquivo é insumo de build,
-não conteúdo do site.
+**Ao publicar, não subir `representantes.csv`, `documentos/` nem `chamado/`.** O
+`robots.txt` já os bloqueia, mas robots não é controle de acesso: a planilha traz
+códigos de faturamento e de cliente que ficaram deliberadamente fora da página, e
+`documentos/` tem a planilha comercial, o briefing e ~110 MB de fotos originais.
+São insumo de build, não conteúdo do site.
 
 Ao publicar: trocar `https://www.hauzestern.com` pelo domínio final em
 `tools/build_pages.py` (constante `SITE`), regenerar e registrar o sitemap no
@@ -384,22 +507,30 @@ Além das divergências listadas na auditoria:
   uma tabela de medidas. Quando vierem, entram em `tools/dados.py`.
 - **Eibsee** é o único modelo do catálogo 2026 sem ficha técnica no guide: a página
   dele não tem a seção "O que faz a diferença" porque não há texto para transcrever.
-- **Ficha técnica das bases C1674 e C1836**: não existe no guide. As duas páginas
-  trazem só o que o catálogo dá e avisam isso.
-- **Foto da base C1836**: não existe no guide. A página mostra um marcador com o
-  símbolo, sem foto de outro modelo no lugar.
+- **Coleção do Krefel**: a ficha não diz. Está em Raízes por inferência (nome de
+  cidade + o que a simboliza, a seda — a regra declarada da coleção). Se a marca
+  disser outra, é trocar `'colecao'` em `tools/dados.py` e rodar o `build_all`.
+- **Krefel no catálogo**: quando sair a versão do catálogo com o Krefel, conferir
+  ícones, altura e capacidade contra ela (hoje vêm só da ficha) e trocar o
+  "Ícones da ficha técnica" da PDP (`icones_da_ficha`).
+- **Carga das outras bases**: a ficha do C1836 dá "Box Rígido suporte até 350kg".
+  Se as fichas das outras bases no guide também trazem esse dado, vale incluir
+  (`'suporte'` em `BASES`).
+- **Ficha técnica da base C1674**: não existe no guide. A página traz só o que o
+  catálogo dá e avisa isso. (A do C1836 chegou em 09/2026, com a foto.)
 - **Fotos dos travesseiros MH 7618 e MH 7619**: o guide não tem fotografia desses
   moldados; as imagens atuais vêm do site antigo e a PDP avisa isso.
-- **Fundo das fotos**: ver a seção [Fotos de produto](#fotos-de-produto). Dez das
-  28 variantes têm o fundo emulado porque a foto naquele fundo não existe no guide.
+- **Fundo das fotos**: ver a seção [Fotos de produto](#fotos-de-produto). Nove das
+  30 variantes têm o fundo emulado, e duas (Hemmen e Dorf, cinza) vêm do
+  catálogo, porque a foto naquele fundo não existe no material da marca.
 - **Resolução do Dorf**: as duas fotos do Dorf têm 1600×1600 px, a menor resolução
   de todo o banco (os outros modelos vão de 5.000 a 8.800 px). Vale pedir o
   original — as duas variantes do Dorf herdam esse limite.
 - **Fotos ambientadas**: existem só para Wohl e Hemmen. Com uma foto de ambiente
-  por modelo, os outros 12 carrosséis ganham o slide do meio.
+  por modelo, os outros 13 carrosséis ganham o slide do meio.
 - **Foto real em fundo cinza em alta** de Hemmen e Dorf: hoje o slide desses dois
   usa o shot de 771 px do catálogo, que fica mole em 1400 px.
-- **Fotos reais em fundo branco** dos 8 modelos emulados encerram a necessidade de
+- **Fotos reais em fundo branco** dos 9 modelos emulados encerram a necessidade de
   emulação.
 - **Eiche** tem ficha técnica e diagrama no guide, mas não está no catálogo 2026.
   Não entrou no site. O diagrama ficou em `assets/camadas/eiche.webp`.
