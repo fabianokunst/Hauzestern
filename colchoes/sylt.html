@@ -51,6 +51,11 @@
   "isSimilarTo": [
     {
       "@type": "Product",
+      "name": "Colchão Hauzestern Krefel",
+      "url": "https://www.hauzestern.com/colchoes/krefel.html"
+    },
+    {
+      "@type": "Product",
       "name": "Colchão Hauzestern Dorf",
       "url": "https://www.hauzestern.com/colchoes/dorf.html"
     },
@@ -198,6 +203,15 @@
         <span>@hauzestern</span>
       </a>
     </nav>
+
+    <!-- busca de produtos: o painel e o índice são do js/busca.js -->
+    <button class="busca-btn" type="button" data-busca-abrir aria-haspopup="dialog"
+            aria-expanded="false" aria-label="Buscar produtos" aria-keyshortcuts="/ Control+K"
+            title="Buscar produtos">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="10.5" cy="10.5"
+        r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m15.2 15.2 5.3 5.3"
+        fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
 
     <button class="burger" id="burger" aria-expanded="false" aria-controls="nav" aria-label="Abrir menu">
       <span></span><span></span><span></span>
@@ -430,10 +444,10 @@
       <p class="section-note reveal">A Coleção Raízes tem seus produtos nomeados através da análise do país e dos pontos principais que o simbolizam. Carregados de contextos culturais, se traduzem em um visual com cores diferentes das outras coleções.</p>
     </header>
     <div class="grid-products">
+      <a class="card reveal" href="krefel.html"><figure><img src="../assets/produtos/krefel-card.jpg" alt="Colchão Hauzestern Krefel" width="640" height="480" loading="lazy"></figure><h3>Krefel</h3><p>35 cm · Tecido Malha Pure Silk • Molas Ensacadas 2.2mm • Micro Molas Ensacadas</p></a>
       <a class="card reveal" href="dorf.html"><figure><img src="../assets/produtos/dorf-card.jpg" alt="Colchão Hauzestern Dorf" width="640" height="480" loading="lazy"></figure><h3>Dorf</h3><p>32 cm · Molas Ensacadas • Bordado Quadro a Quadro • Forro Antiderrapante</p></a>
       <a class="card reveal" href="berg.html"><figure><img src="../assets/produtos/berg-card.jpg" alt="Colchão Hauzestern Berg" width="640" height="480" loading="lazy"></figure><h3>Berg</h3><p>36 cm · Molas Ensacadas • Tecido Malha • Forro Antiderrapante</p></a>
       <a class="card reveal" href="eibsee.html"><figure><img src="../assets/produtos/eibsee-card.jpg" alt="Colchão Hauzestern Eibsee" width="640" height="480" loading="lazy"></figure><h3>Eibsee</h3><p>41 cm · Molas Maxspring • Tecido Linho • Europillow</p></a>
-      <a class="card reveal" href="gipfel.html"><figure><img src="../assets/produtos/gipfel-card.jpg" alt="Colchão Hauzestern Gipfel" width="640" height="480" loading="lazy"></figure><h3>Gipfel</h3><p>32 cm · Molas Ensacadas • Bordado Quadro a Quadro • Forro Antiderrapante</p></a>
     </div>
     <p class="center more reveal"><a class="link-arrow" href="../index.html#colchoes">Ver as três coleções <span aria-hidden="true">&rarr;</span></a></p>
   </div>
@@ -496,5 +510,6 @@
 </footer>
 
 <script src="../js/main.js" defer></script>
+<script src="../js/busca.js" defer></script>
 </body>
 </html>

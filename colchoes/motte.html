@@ -204,6 +204,15 @@
       </a>
     </nav>
 
+    <!-- busca de produtos: o painel e o índice são do js/busca.js -->
+    <button class="busca-btn" type="button" data-busca-abrir aria-haspopup="dialog"
+            aria-expanded="false" aria-label="Buscar produtos" aria-keyshortcuts="/ Control+K"
+            title="Buscar produtos">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="10.5" cy="10.5"
+        r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m15.2 15.2 5.3 5.3"
+        fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+
     <button class="burger" id="burger" aria-expanded="false" aria-controls="nav" aria-label="Abrir menu">
       <span></span><span></span><span></span>
     </button>
@@ -509,5 +518,6 @@
 </footer>
 
 <script src="../js/main.js" defer></script>
+<script src="../js/busca.js" defer></script>
 </body>
 </html>

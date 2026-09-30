@@ -355,6 +355,11 @@ body.interna .pdp{ padding-top:clamp(24px, 3.5vw, 46px); }
   padding-bottom:22px; border-bottom:1px solid var(--linha);
 }
 .section-note{ color:var(--texto-suave); max-width:38ch; margin:0; font-size:15px; }
+.section-note p{ margin:0 0 .9em; }
+.section-note p:last-child{ margin-bottom:0; }
+/* texto de abertura longo: título em cima, texto embaixo, em coluna mais larga */
+.section-head.stack{ flex-direction:column; align-items:flex-start; gap:22px; }
+.section-head.stack .section-note{ max-width:64ch; }
 
 /* =========================================================
    CARDS DE PRODUTO
@@ -1397,4 +1402,179 @@ html:not(.js) .rep-filtros{ display:none; }
   .rep-resumo dd{ font-size:15px; }
   .rep-filtros{ position:static; }
   .rep-contatos{ columns:auto; }
+}
+
+/* =========================================================
+   BUSCA DE PRODUTOS — lupa do header + painel (js/busca.js)
+   Sem JS a lupa nao aparece: o painel e o indice dependem do script.
+   ========================================================= */
+.busca-btn{ display:none; }
+html.js .busca-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  flex:0 0 auto; width:40px; height:40px; padding:0;
+  background:none; border:1px solid rgba(255,255,255,.22); border-radius:50%;
+  color:rgba(255,255,255,.9); cursor:pointer;
+  transition:background var(--transicao), color var(--transicao), border-color var(--transicao);
+}
+html.js .busca-btn:hover{ background:var(--amarelo); border-color:var(--amarelo); color:var(--preto); }
+.busca-btn[hidden]{ display:none !important; }
+/* a lupa entra depois do menu: o menu vai para a direita, colado nela */
+.header-inner > .nav{ margin-left:auto; }
+/* A marca nunca encolhe. Entre 1001px (fim do burger) e ~1235px o menu
+   completo nao cabe ao lado dela: sem isto o logotipo era espremido
+   (41px a 1001px ja antes da lupa; com a lupa, sumia). Nessa faixa o menu
+   aperta os espacos e o Instagram fica so no icone — o texto continua
+   no link para leitor de tela. Conferido em 1001, 1010, 1239 e 1240px. */
+.header-inner > .brand{ flex-shrink:0; }
+@media (min-width:1001px) and (max-width:1239px){
+  .header-inner{ gap:18px; }
+  .nav, .nav ul{ gap:12px; }
+  .nav a{ letter-spacing:.07em; }
+  .nav-ig{ padding:8px !important; }
+  .nav-ig span{
+    position:absolute; width:1px; height:1px; margin:-1px;
+    overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;
+  }
+}
+
+@media (max-width:1000px){
+  /* no mobile o menu sai do fluxo (painel fixo): lupa fica ao lado do burger */
+  html.js .busca-btn{ margin-left:auto; margin-right:-10px; border-color:transparent; }
+  body.nav-open .busca-btn{ visibility:hidden; }
+}
+
+html.busca-aberta, html.busca-aberta body{ overflow:hidden; }
+
+/* o <dialog> cobre a tela e faz o papel de fundo escuro; o painel vai dentro.
+   Assim o visual e o mesmo com showModal ou sem ele (navegador antigo). */
+.busca{
+  position:fixed; inset:0; z-index:200;
+  width:100%; height:100%; max-width:none; max-height:none;
+  margin:0; padding:clamp(12px, 9vh, 96px) var(--gutter) 24px;
+  border:0; background:rgba(29,29,29,.72); color:var(--texto);
+  -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
+  overflow:hidden;
+}
+.busca:not([open]){ display:none; }
+.busca::backdrop{ background:transparent; }
+.busca[open] .busca-painel{ animation:busca-entra .22s cubic-bezier(.22,.61,.36,1); }
+@keyframes busca-entra{ from{ opacity:0; transform:translateY(-8px); } to{ opacity:1; transform:none; } }
+
+.busca-painel{
+  display:flex; flex-direction:column;
+  width:100%; max-width:760px; max-height:100%; margin-inline:auto;
+  background:var(--branco); border-radius:var(--radius);
+  box-shadow:0 24px 60px rgba(0,0,0,.35);
+}
+
+.busca-topo{
+  display:flex; align-items:center; gap:12px;
+  padding:0 12px 0 20px; border-bottom:1px solid var(--linha);
+  transition:border-color var(--transicao);
+}
+.busca-topo:focus-within{ border-bottom-color:var(--amarelo-esc); }
+.busca-topo > svg{ flex:0 0 auto; color:var(--texto-suave); }
+.busca-campo{
+  flex:1 1 auto; min-width:0; height:64px;
+  font-family:var(--font-texto); font-size:19px; font-weight:300; color:var(--texto);
+  background:none; border:0; outline:0; padding:0;
+  -webkit-appearance:none; appearance:none;
+}
+.busca-campo::placeholder{ color:#a5a29c; }
+.busca-campo::-webkit-search-cancel-button{ -webkit-appearance:none; appearance:none; }
+.busca-fechar{
+  flex:0 0 auto; display:inline-flex; align-items:center; gap:8px;
+  height:40px; padding:0 10px; background:none; border:0; border-radius:var(--radius);
+  color:var(--texto-suave); cursor:pointer; font-family:var(--font-titulo);
+}
+.busca-fechar:hover{ color:var(--texto); background:var(--claro); }
+.busca-esc{
+  font-size:10.5px; letter-spacing:.12em; text-transform:uppercase;
+  border:1px solid var(--linha); border-radius:var(--radius); padding:3px 6px; line-height:1;
+}
+
+.busca-status{
+  margin:0; padding:10px 20px 0; min-height:31px;
+  font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--texto-suave);
+}
+.busca-status:empty{ min-height:0; padding:0; }
+
+.busca-corpo{ overflow-y:auto; overscroll-behavior:contain; padding-bottom:8px; }
+
+.busca-lista{ padding:6px 0 0; }
+.busca-item{ border-bottom:1px solid var(--linha); }
+.busca-item:last-child{ border-bottom:0; }
+.busca-link{
+  display:grid; grid-template-columns:96px 1fr; gap:18px; align-items:center;
+  padding:14px 20px; transition:background .2s;
+}
+.busca-item[aria-selected="true"] .busca-link{
+  background:var(--claro); box-shadow:inset 3px 0 0 var(--amarelo);
+}
+.busca-thumb{
+  display:block; width:96px; aspect-ratio:4/3; overflow:hidden; background:var(--claro);
+}
+.busca-thumb img{ width:100%; height:100%; object-fit:cover; }
+.busca-thumb.is-contain img{ object-fit:contain; padding:8%; mix-blend-mode:multiply; }
+.busca-thumb.is-vazia img{ object-fit:contain; padding:18%; opacity:.5; }
+
+.busca-txt{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.busca-cat{
+  display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px;
+  font-family:var(--font-titulo); font-size:10.5px; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--texto-suave);
+}
+.busca-flag{
+  background:var(--amarelo); color:var(--preto);
+  font-size:9px; letter-spacing:.18em; padding:3px 7px;
+}
+.busca-nome{
+  font-family:var(--font-display); font-size:17px; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--texto); line-height:1.35;
+}
+.busca-sub{ font-size:13px; color:var(--texto-suave); line-height:1.5; }
+.busca-trecho{
+  font-size:13.5px; color:#3b3b3b; line-height:1.55; margin-top:4px;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.busca mark{
+  background:rgba(251,219,101,.7); color:inherit; padding:0 1px; border-radius:1px;
+}
+
+.busca-inicio{ padding:22px 20px 18px; }
+.busca-dica{ font-size:14px; color:var(--texto-suave); margin:0 0 20px; max-width:56ch; }
+.busca-rotulo{
+  font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--texto-suave); font-weight:500; margin:0 0 10px;
+}
+.busca-sugestoes{ display:flex; flex-wrap:wrap; gap:8px; }
+.busca-sugestao{
+  font-family:var(--font-titulo); font-size:12px; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--texto); cursor:pointer;
+  background:transparent; border:1px solid var(--linha); border-radius:var(--radius);
+  padding:8px 12px; transition:border-color var(--transicao), background var(--transicao);
+}
+.busca-sugestao:hover{ border-color:var(--texto); background:var(--claro); }
+
+.busca-nada{ padding:22px 20px 20px; font-size:14px; color:var(--texto-suave); }
+.busca-nada p{ max-width:56ch; }
+.busca-nada-tit{ font-size:16px; color:var(--texto); }
+.busca-nada q{ font-weight:500; }
+.busca-nada-links{ display:flex; flex-wrap:wrap; gap:6px 28px; margin:0; }
+.busca-nada-links .link-arrow{ color:var(--texto); font-size:12px; }
+
+@media (max-width:640px){
+  .busca{ padding:0; }
+  .busca-painel{ max-width:none; height:100%; border-radius:0; box-shadow:none; }
+  .busca-topo{ padding-left:16px; }
+  .busca-campo{ font-size:17px; height:58px; }   /* >=16px: o iOS nao da zoom no foco */
+  .busca-esc{ display:none; }
+  .busca-status{ padding-inline:16px; }
+  .busca-link{ grid-template-columns:72px 1fr; gap:14px; padding:12px 16px; }
+  .busca-thumb{ width:72px; }
+  .busca-nome{ font-size:15px; }
+  .busca-inicio, .busca-nada{ padding-inline:16px; }
+}
+@media (prefers-reduced-motion: reduce){
+  .busca[open] .busca-painel{ animation:none; }
 }
